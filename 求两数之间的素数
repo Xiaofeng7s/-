@@ -1,0 +1,66 @@
+package javasushu;
+
+import java.applet.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Random;
+
+public class EX3_16 extends Applet implements ActionListener {
+
+  
+	private static final long serialVersionUID = 599324718657393207L;
+	Label prompt1, prompt2;
+    TextField input1, input2;
+    Button btn, btn1;
+    int a, b, k = 0;
+    int[] c = new int[1000];
+
+    public void init() {
+        prompt1 = new Label("请输入数据下限：");
+        prompt2 = new Label("请输入数据上限：");
+        input1 = new TextField(5);
+        input2 = new TextField(5);
+        btn = new Button("输出结果");
+        add(prompt1);
+        add(input1);
+        add(prompt2);
+        add(input2);
+        add(btn);
+        btn.addActionListener(this);
+        input2.addActionListener(this);
+        setSize(1250,900);
+    }
+
+    public void paint(Graphics g) {
+        for (int i = 0; i < k; i++) {
+        	if(i%5==0)
+        		g.drawString(a + "到" + b + "之间的素数为：" + c[i], 10, 50 + i/5* 20);
+        	else
+        		if(i%5==1)
+        			g.drawString(a + "到" + b + "之间的素数为：" + c[i], 250, 50 + i/5* 20);
+        		else
+        			if(i%5==2)
+        				g.drawString(a + "到" + b + "之间的素数为：" + c[i], 500, 50 + i/5* 20);
+        			else
+        				if(i%5==3)
+        					g.drawString(a + "到" + b + "之间的素数为：" + c[i], 750, 50 + i/5* 20);
+        				else
+        	        			g.drawString(a + "到" + b + "之间的素数为：" + c[i], 1000, 50 + i/5* 20);
+        }
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        a = Integer.parseInt(input1.getText());
+        b = Integer.parseInt(input2.getText());
+        outer_loop:
+        for (int i = a; i <= b; i++) {
+            for (int j = 2; j <= Math.sqrt(i); j++) {
+                if (i % j == 0) {
+                    continue outer_loop;
+                }
+            }
+            c[k++] = i;
+        }
+        repaint();
+    }
+}
