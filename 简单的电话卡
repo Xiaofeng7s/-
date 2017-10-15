@@ -1,0 +1,157 @@
+package userPhoneCard;
+
+import java.applet.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class UserPhoneCard extends Applet implements ActionListener {
+    Panel p1;
+	Label prompt1,prompt2,prompt3,prompt4;
+    TextField input1,input2,input3,input4;
+    Button btn,btn1,btn2;
+
+    int cardNumber,num=0;
+    private int password;
+    double balance = 20.0;
+    String connectNumber;
+    boolean connected;
+
+    void PhoneCard(int cn,int pw,double b,String s){
+        cardNumber = cn;
+        password = pw;
+        if(b>0)
+            balance = b;
+        else {
+            System.exit(1);
+            }
+        connectNumber = s;
+        connected = false;
+    }
+    boolean performConnection(long cn,int pw){			//判断卡号和密码是否正确
+        if(cn == 16114483 && pw == 1997){
+            connected = true;
+            return true;
+        }
+        else {
+            connected = false;
+            return false;
+        }
+    }
+    
+    double getBalance(){   	//获得卡内余额
+        if(connected)
+            return balance;
+        else
+            return -1;
+    }
+    void performDial(){			//接通后扣费
+        if(connected)
+            balance -= 0.5;
+    }
+    void clear(){
+    	input1.setText("");
+    	input2.setText("");
+    	input4.setText("");
+    }
+
+    public void init(){
+       prompt1 = new Label("请输入卡号：");
+    	p1 = new Panel();
+        input1 = new TextField("请输入卡号：",15);
+        input2 = new TextField("请输入密码：",15);
+        input4 = new TextField("请输入接入卡号：",15);
+        btn = new Button("输出信息");
+        btn1 = new Button("接打电话");
+        btn2 = new Button("挂断电话");
+        add(prompt1); 
+        input1.addFocusListener(new HandleFocus());
+        input2.addFocusListener(new HandleFocus());
+        btn1.addActionListener(this);
+        btn2.addActionListener(this);
+        input4.addFocusListener(new HandleFocus());
+        btn.addActionListener(this);
+        p1.setLayout(new BorderLayout(10,10));
+        p1.add(input1,BorderLayout.NORTH);
+        p1.add(input2,BorderLayout.WEST);
+        p1.add(btn1,BorderLayout.EAST);
+        p1.add(input4,BorderLayout.SOUTH);
+        p1.add(btn,BorderLayout.CENTER);
+        p1.setVisible(true);
+        add(p1);
+        add(btn2);
+        setSize(300,300);
+        setVisible(true);
+    }
+    class HandleFocus implements FocusListener{
+    	public void focusGained(FocusEvent e) {
+    		TextField text = (TextField)(e.getSource());
+    		text.setBackground(Color.pink);
+    		text.setText("");
+    		
+    	}
+    	public void focusLost(FocusEvent e) {}
+    }
+    
+    public void paint(Graphics g){
+        g.drawString("卡号："+cardNumber,20,200);
+        g.drawString("余额："+balance,20,230);
+        g.drawString("接入卡号："+connectNumber,20,260);
+    }
+    public void actionPerformed(ActionEvent e){
+        cardNumber = Integer.parseInt(input1.getText());
+        password = Integer.parseInt(input2.getText());
+        connectNumber = input4.getText();
+        PhoneCard(cardNumber,password,balance,connectNumber);
+        performConnection(cardNumber,password);
+       // performDial();
+        
+       if(e.getSource() == btn){
+    	   if(cardNumber == 16114483&&password == 1997){
+    		   input1.setBackground(Color.green);
+        	   input2.setBackground(Color.green);
+        	   showStatus("信息验证正确，欢迎使用");
+        	   repaint(); 
+    	   }
+    	   else{
+    		   input1.setBackground(Color.red);
+    		   input2.setBackground(Color.red);
+    		   clear();
+    		   showStatus("您输入的信息有误，请重新输入"); 
+    	   }
+   }
+       else
+    	   if(e.getSource() == btn1){
+    		   if(cardNumber == 16114483&&password == 1997){
+    			   num++;
+    			   performDial();
+        		   showStatus("已接通"+num+"次");
+        		   input1.setBackground(Color.green);
+            	   input2.setBackground(Color.green);
+            	   repaint(); 
+        	   }
+        	   else{
+        		   input1.setBackground(Color.red);
+        		   input2.setBackground(Color.red);
+        		   clear();
+        		   showStatus("您输入的信息有误，请重新输入"); 
+        	   }  
+    	   }
+    	   else
+        	   if(e.getSource() == btn2){
+        		   if(cardNumber == 16114483&&password == 1997){
+        			   connected = false;
+            		   showStatus("已挂断电话，感谢您的使用");
+            		   performDial();
+            		   input1.setBackground(Color.green);
+                	   input2.setBackground(Color.green);
+                	   repaint(); 
+            	   }
+            	   else{
+            		   input1.setBackground(Color.red);
+            		   input2.setBackground(Color.red);
+            		   clear();
+            		   showStatus("您输入的信息有误，请重新输入"); 
+            	   }
+        	   }
+    }
+}
