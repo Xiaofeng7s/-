@@ -1,0 +1,156 @@
+package bird;
+
+import java.awt.*;
+import java.awt.event.*;
+
+public class Bird {
+ 
+    public static void main(String args[])
+    {
+        new myframe();
+    }  
+}
+
+class myframe extends Frame implements ActionListener
+{
+	TextField t1,t2;
+	TextArea output;
+    Label l1,c5;//c5为控制台中间的标签
+    Button b1,b2,c1,c2,c3,c4;//输出按钮 控制台四个方向按钮
+    Panel controlpad;//控制台容器
+    
+    String feature="黄黑色";//羽毛颜色
+    int speed_x=0,speed_y=0,x=500,y=500;//定义鸟的速度和位置，speed_x代表在x轴上的速度，speed_y代表在y轴上的速度
+    int life = 1000;//小鸟的初始生命值是1000
+    boolean state=false;//定义鸟的状态，false为着陆，true为飞行
+    
+    /*
+     * 鸟类参考描述：属性：羽毛颜色
+            飞行速度
+            状态(着陆或飞行)
+            位置(x,y坐标)
+      方法：
+            飞行
+             */
+    public myframe()
+    {
+        //No.1
+    	controlpad = new Panel();
+    	t1 = new TextField("在这里输入x轴速度",10);
+    	t2 = new TextField("在这里输入y轴速度",10);
+        l1=new Label("结果输出：                              ");
+        c5=new Label("方向控制台");
+        b1=new Button("初始状态输出");
+        b2=new Button("小鸟降落");
+        c1=new Button("向上");
+        c2=new Button("向右");
+        c3=new Button("向下");
+        c4=new Button("向左");
+        output = new TextArea(5,40);
+        //output.setTxet("");
+        this.setLayout(new FlowLayout());
+        controlpad.setLayout(new BorderLayout(10,10));
+        controlpad.add(c1,BorderLayout.NORTH);
+        controlpad.add(c4,BorderLayout.WEST);
+        controlpad.add(c2,BorderLayout.EAST);
+        controlpad.add(c3,BorderLayout.SOUTH);
+        controlpad.add(c5,BorderLayout.CENTER);
+        controlpad.setVisible(true);
+        add(t1);
+        add(t2);
+        add(b1);
+        add(l1);  
+        add(output);
+        add(controlpad);
+        //t1.addActionListener(this);
+        b1.addActionListener(this);
+        b2.addActionListener(this);
+        c1.addActionListener(this);
+        c2.addActionListener(this);
+        c3.addActionListener(this);
+        c4.addActionListener(this);
+        t1.addFocusListener(new HandleFocus());
+        t2.addFocusListener(new HandleFocus());
+        addWindowListener(new HandleClose());//window窗口监视注册
+        this.setSize(400,300);//设置窗口大小
+        this.setVisible(true);//让窗口可见
+        this.setTitle("鸟类平面飞行状态:");//设置窗口标题
+    }
+    class HandleFocus implements FocusListener{
+    	public void focusGained(FocusEvent e) {
+    		TextField text = (TextField)(e.getSource());
+    		//text.setBackground(Color.pink);
+    		text.setText("");
+    		
+    	}
+    	public void focusLost(FocusEvent e) {}
+    }
+    public void actionPerformed(ActionEvent e)
+    {
+    	speed_x = Integer.parseInt(t1.getText());
+    	speed_y = Integer.parseInt(t2.getText());
+    	
+    if(life>0){//判断小鸟生命值是否大于0，如果大于0则继续执行
+    	if(e.getSource()==b1)
+    	{
+    		
+    		out();
+    	}else
+    		if(e.getSource()==c1){
+    			fly(0,0,speed_y,0)	;
+    	}else
+    		if(e.getSource()==c2){
+    			fly(0,speed_x,0,0)	;
+    	}else
+    		if(e.getSource()==c3){
+    			fly(0,0,0,speed_y)	;
+    	}else
+    		if(e.getSource()==c4){
+    			fly(speed_x,0,0,0)	;
+    	}
+    	}else{
+    		output.setText("小鸟长久未降落，已累死!"+"\n"+"请关闭程序重新开始!");
+    	}
+       /* if(e.getSource()==t1||e.getSource()==b1)//如果是由t1上输入enter键引起的
+        {
+            String s=t1.getText();
+           String stemp="";
+          //No.3开始
+ for(int i=s.length()-1;i>-1;i--)//s.length()获得字符串s中字符的个数
+               stemp+=s.charAt(i);
+          //No.3结束
+          //No.2
+            output.setText(stemp);
+        }
+        else //否则
+        {
+            this.dispose();//释放系统资源
+            System.exit(0);//正常退出应用程序
+        } */
+        }
+    void out(){
+    	output.setText("小鸟的颜色是："+feature+"\n"+"小鸟的生命值是："+life+"\n"+"小鸟的位置是:（"+x+","+y+"）"+"\n"+"横向速度是:"+speed_x+"\n"+"纵向速度是："+speed_y);
+    }
+    void fly(int x1,int x2,int y1,int y2){
+    	life -=x1+x2+y1+y2;
+    	x -=x1; //计算向左的位置
+    	x +=x2;//计算向右的位置
+    	y +=y1;//计算向上的位置
+    	y -=y2;//计算向下的位置
+    	out();
+    }
+    
+    }
+class HandleClose extends WindowAdapter{//window监视执行函数
+	public void windowClosing(WindowEvent e)
+	{
+		dispose();
+		System.exit(0);
+		
+	}
+	private void dispose() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+}
