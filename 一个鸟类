@@ -109,7 +109,7 @@ class myframe extends Frame implements ActionListener
     			fly(speed_x,0,0,0)	;
     	}
     	}else{
-    		output.setText("小鸟长久未降落，已累死!"+"\n"+"请关闭程序重新开始!");
+    		out1();
     	}
        /* if(e.getSource()==t1||e.getSource()==b1)//如果是由t1上输入enter键引起的
         {
@@ -131,6 +131,9 @@ class myframe extends Frame implements ActionListener
     void out(){
     	output.setText("小鸟的颜色是："+feature+"\n"+"小鸟的生命值是："+life+"\n"+"小鸟的位置是:（"+x+","+y+"）"+"\n"+"横向速度是:"+speed_x+"\n"+"纵向速度是："+speed_y);
     }
+    void out1(){
+    	output.setText("小鸟长久未降落，已累死，掉了下来!"+"\n"+"请关闭程序重新开始!");
+    }
     void fly(int x1,int x2,int y1,int y2){
     	life -=x1+x2+y1+y2;
     	x -=x1; //计算向左的位置
@@ -138,6 +141,8 @@ class myframe extends Frame implements ActionListener
     	y +=y1;//计算向上的位置
     	y -=y2;//计算向下的位置
     	out();
+    	if(life<=0)
+    		out1();
     }
     
     }
