@@ -29,7 +29,7 @@ class num extends Frame implements ActionListener {
         prompt2 = new Label("请输入数据下限：");
         input1 = new TextField(5);
         input2 = new TextField(5);
-        output = new TextArea("",20,50);
+        output = new TextArea("",20,60);
         btn = new Button("输出素数");
         add(prompt1);
         add(input1);
@@ -37,6 +37,8 @@ class num extends Frame implements ActionListener {
         add(input2);
         add(btn);
         add(output);
+		output.setBackground(Color.black);
+		output.setForeground(Color.green);
         btn.addActionListener(this);
         input1.addFocusListener(new HandleFocus());
         input2.addFocusListener(new HandleFocus());
@@ -63,11 +65,13 @@ class num extends Frame implements ActionListener {
             }
             list.add(i+";");
         }
+       
         for(int m=0;m<list.size();m++) {
-        	if(m%10==0)
+        	if(m%10==0) {
         		output.append("\n");
+            }
         	output.append(list.get(m));
-        }
+    }
     }
     class HandleFocus implements FocusListener{
     	public void focusGained(FocusEvent e) {
@@ -80,6 +84,7 @@ class num extends Frame implements ActionListener {
     		TextField text = (TextField)(e.getSource());
     		text.setBackground(Color.white);
     		output.setText(a+"与"+b+"之间的素数有："+"\n");
+    		list.clear();
     	}
     }
     class windowsClose extends WindowAdapter{//window监视执行函数
