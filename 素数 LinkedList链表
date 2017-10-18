@@ -1,0 +1,93 @@
+package primeNumber;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+
+public class PrimeNumbber {
+	 
+    public static void main(String args[])
+    {
+        new num();
+    }  
+}
+
+class num extends Frame implements ActionListener {
+	
+	Label prompt1, prompt2;
+    TextField input1, input2;
+    TextArea output;
+    Button btn;
+    
+    int a, b, k = 0;
+    String lst;
+    LinkedList<String> list = new LinkedList<>();
+
+    public  num() {
+    	
+        prompt1 = new Label("请输入数据上限：");
+        prompt2 = new Label("请输入数据下限：");
+        input1 = new TextField(5);
+        input2 = new TextField(5);
+        output = new TextArea("",20,50);
+        btn = new Button("输出素数");
+        add(prompt1);
+        add(input1);
+        add(prompt2);
+        add(input2);
+        add(btn);
+        add(output);
+        btn.addActionListener(this);
+        input1.addFocusListener(new HandleFocus());
+        input2.addFocusListener(new HandleFocus());
+        addWindowListener(new windowsClose());
+        
+        setLayout(new FlowLayout());//少不得，否则add添加的东西会一一覆盖，最后只有最后一个add能显示
+        
+        setSize(500,500);
+        setTitle("求素数的application");
+        setVisible(true);
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+        a = Integer.parseInt(input1.getText());
+        b = Integer.parseInt(input2.getText());
+        output.setText(a+"与"+b+"之间的素数有："+"\n");
+       
+        outer_loop:
+        for (int i = a; i <= b; i++) {
+            for (int j = 2; j <= Math.sqrt(i); j++) {
+                if (i % j == 0) {
+                    continue outer_loop;
+                }
+            }
+            list.add(i+";");
+        }
+        for(int m=0;m<list.size();m++) {
+        	if(m%10==0)
+        		output.append("\n");
+        	output.append(list.get(m));
+        }
+    }
+    class HandleFocus implements FocusListener{
+    	public void focusGained(FocusEvent e) {
+    		TextField text = (TextField)(e.getSource());
+    		text.setBackground(Color.pink);
+    		text.setText("");
+    		
+    	}
+    	public void focusLost(FocusEvent e) {
+    		TextField text = (TextField)(e.getSource());
+    		text.setBackground(Color.white);
+    		output.setText(a+"与"+b+"之间的素数有："+"\n");
+    	}
+    }
+    class windowsClose extends WindowAdapter{//window监视执行函数
+    	public void windowClosing(WindowEvent e)
+    	{
+    		dispose();
+    		System.exit(0);
+    		
+    	}  	
+    }//end of winC
+}
