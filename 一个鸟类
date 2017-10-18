@@ -16,13 +16,15 @@ class myframe extends Frame implements ActionListener
 	TextField t1,t2;
 	TextArea output;
     Label l1,c5;//c5为控制台中间的标签
-    Button b1,b2,c1,c2,c3,c4;//输出按钮 控制台四个方向按钮
+    Button b1,b2,b3,c1,c2,c3,c4;//输出按钮 控制台四个方向按钮
     Panel controlpad;//控制台容器
     
+    final int birdlife = 1000;//小鸟的初始生命值是1000
     String feature="黄黑色";//羽毛颜色
     int speed_x=0,speed_y=0,x=500,y=500;//定义鸟的速度和位置，speed_x代表在x轴上的速度，speed_y代表在y轴上的速度
-    int life = 1000;//小鸟的初始生命值是1000
-    boolean state=false;//定义鸟的状态，false为着陆，true为飞行
+    int life = birdlife;//小鸟的初始生命值是1000
+    int randomx,randomy;//定义随机数
+    boolean state=true,win = false;//定义鸟的状态，false为着陆，true为飞行
     
     /*
      * 鸟类参考描述：属性：羽毛颜色
@@ -41,12 +43,15 @@ class myframe extends Frame implements ActionListener
         l1=new Label("结果输出：                              ");
         c5=new Label("方向控制台");
         b1=new Button("初始状态输出");
-        b2=new Button("小鸟降落");
+        b2=new Button("降落觅食");
+        b3 = new Button("重新开始");
         c1=new Button("向上");
         c2=new Button("向右");
         c3=new Button("向下");
         c4=new Button("向左");
-        output = new TextArea(5,40);
+        randomxy();//产生虫子位置随机数
+        output = new TextArea("鸟的初始位置在：（"+x+","+y+"）"+"\n"+"虫子位置在："
+        		+ "（"+randomx+","+randomy+"）",7,40);
         //output.setTxet("");
         this.setLayout(new FlowLayout());
         controlpad.setLayout(new BorderLayout(10,10));
@@ -59,12 +64,15 @@ class myframe extends Frame implements ActionListener
         add(t1);
         add(t2);
         add(b1);
+        add(b2);
+        add(b3);
         add(l1);  
         add(output);
         add(controlpad);
         //t1.addActionListener(this);
         b1.addActionListener(this);
         b2.addActionListener(this);
+        b3.addActionListener(this);
         c1.addActionListener(this);
         c2.addActionListener(this);
         c3.addActionListener(this);
@@ -72,7 +80,7 @@ class myframe extends Frame implements ActionListener
         t1.addFocusListener(new HandleFocus());
         t2.addFocusListener(new HandleFocus());
         addWindowListener(new HandleClose());//window窗口监视注册
-        this.setSize(400,300);//设置窗口大小
+        this.setSize(400,400);//设置窗口大小
         this.setVisible(true);//让窗口可见
         this.setTitle("鸟类平面飞行状态:");//设置窗口标题
     }
@@ -89,12 +97,19 @@ class myframe extends Frame implements ActionListener
     {
     	speed_x = Integer.parseInt(t1.getText());
     	speed_y = Integer.parseInt(t2.getText());
-    	
+    
+    	//判断是否胜利，生命值大于2000即胜利
+    	if(life>=2000)
+    		win = true;
+    	else
+    		win = false;
+    	//判断语句结束
+    	if(!win) {
     if(life>0){//判断小鸟生命值是否大于0，如果大于0则继续执行
     	if(e.getSource()==b1)
     	{
     		
-    		out();
+    		liveout();
     	}else
     		if(e.getSource()==c1){
     			fly(0,0,speed_y,0)	;
@@ -107,9 +122,15 @@ class myframe extends Frame implements ActionListener
     	}else
     		if(e.getSource()==c4){
     			fly(speed_x,0,0,0)	;
-    	}
-    	}else{
-    		out1();
+    	}    	
+    }//end of if life
+		if(e.getSource()==b2){//降落觅食
+			land();
+	      }	
+    	} //end of if !win 
+    	else
+    	{
+    	output.setText("你已经赢了，好厉害！");
     	}
        /* if(e.getSource()==t1||e.getSource()==b1)//如果是由t1上输入enter键引起的
         {
@@ -127,22 +148,68 @@ class myframe extends Frame implements ActionListener
             this.dispose();//释放系统资源
             System.exit(0);//正常退出应用程序
         } */
-        }
-    void out(){
-    	output.setText("小鸟的颜色是："+feature+"\n"+"小鸟的生命值是："+life+"\n"+"小鸟的位置是:（"+x+","+y+"）"+"\n"+"横向速度是:"+speed_x+"\n"+"纵向速度是："+speed_y);
+    	if(e.getSource()==b3){//重新开始按钮
+			Newlife();
+			liveout();
+	      }	
+    }//end of actionPerformed
+    void liveout(){//小鸟生命值大于零时输出
+    	if(state)
+    		output.setText("小鸟的颜色是："+feature+"\n"+"小鸟的生命值是："+
+    	life+"\n"+"小鸟的位置是:（"+x+","+y+"）"+"\n"+"横向速度是:"+speed_x+
+    	"\n"+"纵向速度是："+speed_y+"\n"+"小鸟状态：飞行"+"\n"+"在（"+randomx+","+randomy+"）处有小虫子");
+    	
+    	else
+    		output.setText("小鸟的颜色是："+feature+"\n"+"小鸟的生命值是："+
+    	life+"\n"+"小鸟的位置是:（"+x+","+y+"）"+"\n"+"横向速度是:"+speed_x+
+    	"\n"+"纵向速度是："+speed_y+"\n"+"小鸟状态：着陆"+"\n"+"在（"+randomx+","+randomy+"）处有小虫子");
     }
-    void out1(){
+    void deadout(){//小鸟生命值小于零时输出
     	output.setText("小鸟长久未降落，已累死，掉了下来!"+"\n"+"请关闭程序重新开始!");
     }
+    void Newlife() {//重新开始，赋给小鸟初始值
+    	x=500;
+    	y=500;
+    	randomxy();
+    	life = birdlife;
+    	state = true;
+    }
+    void land() {
+    	state = false;
+    	if(life>0) {
+    	if(x==randomx&&y==randomy) {
+    		life += randomx+randomy;
+    		randomxy();
+    } 
+		liveout();
+    	}
+	if(life<=0)
+		deadout();
+    }
+    void randomxy() {
+    	randomx =(int)( Math.random()*1000);//产生0到1000之间的随机数（不包括1000）
+    	randomy =(int)( Math.random()*1000);//产生0到1000之间的随机数（不包括1000）
+    }
+   /* int max(int a,int b) {//返回两个数中的最大数
+    	int max = 0;
+    	a = randomx;
+    	b = randomy;
+    	if(randomx>=randomy)
+    		max = randomx;
+    	else
+    		max = randomy;
+    	return max;
+    }*/
     void fly(int x1,int x2,int y1,int y2){
+    	state = true;
     	life -=x1+x2+y1+y2;
     	x -=x1; //计算向左的位置
     	x +=x2;//计算向右的位置
     	y +=y1;//计算向上的位置
     	y -=y2;//计算向下的位置
-    	out();
+    	liveout();
     	if(life<=0)
-    		out1();
+    		deadout();
     }
     
     }
