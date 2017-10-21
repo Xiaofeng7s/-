@@ -1,0 +1,418 @@
+/*
+ * 作者：郭坤坤
+ * 第一版开发日期：2017年10月19日
+ * 修改：10月21日21:00
+ * */
+
+package student;
+
+import java.awt.event.*;
+import java.util.LinkedList;
+import java.awt.*;
+
+public class  StudentClass {
+	public static void main(String args[])
+    {
+        new StudentFrame();
+    } 
+}
+
+class StudentFrame extends Frame implements ActionListener,ItemListener{
+
+	Label prompt1, prompt2, prompt3, prompt4, prompt5, prompt6, prompt7, prompt8, prompt9,prompt10;
+	TextField input1,input2,input3,input4,input5,input6,input7;
+	TextArea output;
+	CheckboxGroup style1,style2;
+	Checkbox stu,tea,man,woman;
+	Button btn,btn1,btn2,btn3,btn4;
+	
+	String name,identity,sex,mailbox,professions,courses,id,tel,salary;//姓名 身份 性别 邮箱 专业 课程
+	//学号 电话 薪水
+	Boolean stuOrtea,manOrwoman;
+	
+	LinkedList<Student>  students =new LinkedList<>();
+	LinkedList<Student>  teachers =new LinkedList<>();
+	
+	StudentFrame(){
+		super("学生教师application");
+		prompt1 = new Label("姓           名：");
+		prompt2 = new Label("学号/工号：");
+		prompt3 = new Label("身           份：");
+		prompt4 = new Label("性           别：");
+		prompt5 = new Label("专           业：");
+		prompt6 = new Label("所 修 课 程：");
+		prompt7 = new Label("联 系 电 话：");
+		prompt8 = new Label("邮           箱：");
+		prompt9 = new Label("工           资：");
+		prompt10 = new Label("信 息 输 出 文 本 框 ：");
+		
+		input1 = new TextField(20);
+		input2 = new TextField(20);
+		input3 = new TextField(20);
+		input4 = new TextField(20);
+		input5= new TextField(20);
+		input6 = new TextField(20);
+		input7 = new TextField("无",20);
+		output = new TextArea(10,30);
+		style1 = new CheckboxGroup();
+		style2 = new CheckboxGroup();
+		
+		stu = new Checkbox("学生          ", false,style1);
+		tea = new Checkbox("教师          ", false,style1);
+		man = new Checkbox("男               ", false,style2);
+		woman = new Checkbox("女              ", false,style2);
+		
+		btn = new Button("加入信息");
+		btn1 = new Button("修改信息");
+		btn2 = new Button("查询信息");
+		btn3 = new Button("输出所有");
+		btn4 = new Button("删除信息");
+		
+		setLayout(new FlowLayout());//少不得，否则add添加的东西会一一覆盖，最后只有最后一个add能显示
+		setSize(300,550);
+        setVisible(true);
+        add(prompt1);   add(input1);
+        add(prompt2);   add(input2);
+        add(prompt3);   add(stu);add(tea);
+        add(prompt4);   add(man);add(woman);
+        add(prompt5);   add(input3);
+        add(prompt6);   add(input4);
+        add(prompt7);   add(input5);
+        add(prompt8);   add(input6);
+        add(prompt9);   add(input7);
+        add(prompt10);  add(output);    
+        add(btn);
+        add(btn4);
+        add(btn1);
+        add(btn2);
+        add(btn3);
+        
+        addWindowListener(new windowsClose());
+        btn.addActionListener(this);
+        btn1.addActionListener(this);
+        btn2.addActionListener(this);
+        btn3.addActionListener(this);
+        btn4.addActionListener(this);
+        
+        stu.addItemListener(this);
+        tea.addItemListener(this);
+        man.addItemListener(this);
+        woman.addItemListener(this);
+        
+	}//构造函数
+	
+	public void actionPerformed(ActionEvent e) {
+		
+		name = input1.getText();
+		id = input2.getText();
+		professions = input3.getText();
+		courses = input4.getText();
+		tel = input5.getText();
+		mailbox = input6.getText();
+		salary = input7.getText();
+		
+		 
+		if(e.getSource()==btn) {//如果是加入按钮触发
+		if(stuOrtea) {//如果是学生
+		    Student stude = new Student(name, identity, sex, mailbox, professions, courses, id, tel);	
+		    StudentList.addStudent(students, stude);//像链表students中加入一个Student类的引用
+		    output.setText(StudentList.getStudent(students, id).getsAll());//在文本框中输出刚加入的信息
+		}else {//如果是教师
+			Student stude = new Student(name, identity, sex, mailbox, professions, courses, id, tel,salary);
+			 StudentList.addStudent(teachers, stude);
+			output.setText(StudentList.getStudent(teachers, id).gettAll());
+		}
+		}else
+			if(e.getSource()==btn1) {//如果触发修改按钮
+				if(stuOrtea) {
+				StudentList.getStudent(students, id).setsall( mailbox, professions, courses, tel);
+				output.setText(StudentList.getStudent(students, id).getsAll());
+				}
+				else {
+					StudentList.getStudent(teachers, id).settall(mailbox, professions, courses, tel,salary);
+					output.setText(StudentList.getStudent(teachers, id).gettAll());
+				}
+			}else
+				if(e.getSource()==btn2) {//如果触发查询按钮                 
+					if(StudentList.seekAll(students, id)) {
+						Student p = StudentList.getStudent(students, id);
+						input1.setText(p.getName());
+						input3.setText(p.getProfessions());
+						input4.setText(p.getCourses());
+						input5.setText(p.getTel());
+						input6.setText(p.getMailbox());
+						
+						output.setText(p.getsAll());
+					}
+					else 
+						if(StudentList.seekAll(teachers, id)){
+							Student p = StudentList.getStudent(teachers, id);
+							input1.setText(p.getName());
+							input3.setText(p.getProfessions());
+							input4.setText(p.getCourses());
+							input5.setText(p.getTel());
+							input6.setText(p.getMailbox());
+							input7.setText(p.getSalary());
+							
+						output.setText(p.gettAll());
+					}
+		   }else
+				if(e.getSource()==btn3) {//如果触发输出所有按钮
+					output.setText("以下是学生的全部信息："+"\n");
+					for (Student st: students)
+						output.append(st.getsAll());
+					output.append("以下是教师的全部信息："+"\n");
+					for (Student st: teachers) 
+						output.append(st.gettAll());
+				}else
+					if(e.getSource()==btn4) {//如果触发删除信息按钮
+						StudentList.deleteStudent(students, id);
+					}
+		
+		
+		
+	}
+	public void itemStateChanged(ItemEvent e) {
+		
+		Checkbox temp = (Checkbox)(e.getSource());
+		if(temp.getLabel()=="学生          ") {
+			stuOrtea = true;
+			identity = "学生";
+		}else 
+			if(temp.getLabel()=="教师          "){
+				stuOrtea = false;
+				identity = "教师";
+		}else 
+			if(temp.getLabel()=="男               "){
+				manOrwoman = true;
+				sex = "男";
+		}else 
+			if(temp.getLabel()=="女              "){
+				manOrwoman = false;
+				sex = "女";
+		}
+		
+	}
+	
+	class windowsClose extends WindowAdapter{//window监视执行函数
+    	public void windowClosing(WindowEvent e)
+    	{
+    		dispose();
+    		System.exit(0);
+    		
+    	}  	
+    }//end of winC
+	
+	void alter() {
+		
+	}
+		
+}//end of StufentFrame
+
+class Student{
+	
+	String name,identity,sex,mailbox,professions,courses,id,tel,salary;//姓名 身份 性别 邮箱 专业 课程
+	//学号 电话 薪水
+  
+	Student(String a,String b,String c,String d,String f, String g,String h,String j,String k){
+		name = a;
+		identity = b;
+		sex = c;
+		mailbox = d;
+		professions = f;
+		courses = g;
+		id = h;
+		tel = j;
+		salary = k;
+     }
+	
+	Student(String a,String b,String c,String d,String f, String g,String h,String j){
+		name = a;
+		identity = b;
+		sex = c;
+		mailbox = d;
+		professions = f;
+		courses = g;
+		id = h;
+		tel = j;          
+     }
+	//用于输出全部信息
+	String getsAll() {
+		String s = new String("姓名："+name+"\n"+"学号："+id+"\n"+"联系方式："+tel+"\n"+"身份："+identity+"\n"+"性别："+sex+"\n"+"邮箱："+mailbox+"\n"+"专业："+professions+"\n"+"所修课程："+courses+"\n"+"\n");
+		 return s;
+	 }
+	String gettAll() {
+		String s = new String("姓名："+name+"\n"+"工号："+id+"\n"+"联系方式："+tel+"\n"+"身份："+identity+"\n"+"性别："+sex+"\n"+"邮箱："+mailbox+"\n"+"专业："+professions+"\n"+"所授课程："+courses+"\n"+"薪水："+salary+"\n"+"\n");
+		 return s;
+	 }
+	//用于修改信息
+	String setsAll(String a,String b,String c,String d,String f, String g,String h,String j) {
+		name = a;
+		identity = b;
+		sex = c;
+		mailbox = d;
+		professions = f;
+		courses = g;
+		id = h;
+		tel = j;   
+		
+		String s = new String("姓名："+name+"\n"+"学号："+id+"\n"+"联系方式："+tel+"\n"+"身份："+identity+"\n"+"性别："+sex+"\n"+"邮箱："+mailbox+"\n"+"专业："+professions+"\n"+"所修课程："+courses+"\n"+"\n");
+		 return s;
+	 }
+	String settAll(String a,String b,String c,String d,String f, String g,String h,String j,String k) {
+		name = a;
+		identity = b;
+		sex = c;
+		mailbox = d;
+		professions = f;
+		courses = g;
+		id = h;
+		tel = j;
+		salary = k;
+		
+		String s = new String("姓名："+name+"\n"+"工号："+id+"\n"+"联系方式："+tel+"\n"+"身份："+identity+"\n"+"性别："+sex+"\n"+"邮箱："+mailbox+"\n"+"专业："+professions+"\n"+"所授课程："+courses+"\n"+"薪水："+salary+"\n"+"\n");
+		 return s;
+	 }
+	String setsall(String d,String f, String g,String j) {
+
+		mailbox = d;
+		professions = f;
+		courses = g;
+		tel = j;   
+		
+		String s = new String("联系方式："+tel+"\n"+"邮箱："+mailbox+"\n"+"专业："+professions+"\n"+"所修课程："+courses+"\n"+"\n");
+		 return s;
+	 }
+	String settall(String d,String f, String g,String j,String k) {
+		
+		mailbox = d;
+		professions = f;
+		courses = g;
+		tel = j;
+		salary = k;
+		
+		String s = new String("联系方式："+tel+"\n"+"邮箱："+mailbox+"\n"+"专业："+professions+"\n"+"所授课程："+courses+"\n"+"薪水："+salary+"\n"+"\n");
+		 return s;
+	 }
+	
+	 String getName() {//获取名字
+		 return name;
+	 }
+	 String setName(String a) {//修改名字
+		 name = a;
+		 return name;
+	 }
+	 
+	 String getIdentity() {//获取身份
+		 return identity;
+	 }
+	 String setIdentity(String b) {//修改身份
+		 identity = b;
+		 return identity;
+	 }
+	 
+	 String getSex() {//获取性别
+		 return sex;
+	 }
+	 String setSex(String c) {//修改性别
+		 sex = c;
+		 return sex;
+	 }
+	 
+	 String getProfessions() {//获取专业
+		 return professions;
+	 }
+	 String setProfessionsx(String f) {//修改专业
+		 professions = f;
+		 return professions;
+	 }
+	 
+	 String getMailbox() {//获取邮箱
+		 return mailbox;
+	 }
+	 String setMailbox(String d) {//修改邮箱
+		 mailbox = d;
+		 return mailbox;
+	 } 
+	 String getCourses() {//获取课程
+		 return courses;
+	 }
+	 String setCourses(String g) {//修改课程
+		 courses = g;
+		 return courses;
+	 } 
+	 String getId() {//获取学号
+		 return id;
+	 }
+	 String setId(String h) {//修改学号
+		 id = h;
+		 return id;
+	 } 
+	 String getTel() {//获取电话号码
+		 return tel;
+	 }
+	 String setTel(String j) {//修改号码
+		 tel = j;
+		 return tel;
+	 } 
+	 String getSalary() {//获取薪水
+		 return salary;
+	 }
+	 String setSalary(String k) {//修改薪水
+		 salary = k;
+		 return salary;
+	 }
+	 
+}//end of 
+class StudentList {
+	
+	public static void addStudent(LinkedList<Student> stu, Student s) {
+		stu.add(s);
+		}
+	
+	public static void deleteStudent(LinkedList<Student> stu, String no) {
+		Student student = null;
+		for (Student s: stu) {    //遍历链表stu里的每个元素
+		if (no != null && s.getId().equals(no)) {
+		student = s;
+		break;
+		}
+		}
+		if (student != null) {
+			stu.remove(student);
+		}		
+   }
+	
+	public static Student getStudent(LinkedList<Student> stu, String id) {
+		Student student = null;
+		for (Student st: stu) {    //遍历链表stu里的每个元素
+			if (id != null )
+			if(st.getId().equals(id))//通过学号查找
+			{
+			student = st;
+			break;
+			}
+			}
+		return student;
+		}
+	public static Boolean seekAll(LinkedList<Student> stu, String id) {//查询链表中是否有id
+			Boolean correct = false;
+		for (Student st: stu) {    //遍历链表stu里的每个元素
+			if (id != null ) {
+				if(st.getId().equals(id))//通过学号查找
+				{
+					correct = true;	
+					break;
+				}else {
+					correct = false;
+					break;
+				}
+			}else {
+				correct = false;
+				break;
+			}		
+		}
+		return correct;
+    }
+}//end of StudentList
+
