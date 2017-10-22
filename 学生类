@@ -1,7 +1,7 @@
 /*
  * 作者：郭坤坤
  * 第一版开发日期：2017年10月19日
- * 修改：10月21日21:00
+ * 修改：10月22日14:00
  * */
 
 package student;
@@ -53,7 +53,8 @@ class StudentFrame extends Frame implements ActionListener,ItemListener{
 		input5= new TextField(20);
 		input6 = new TextField(20);
 		input7 = new TextField("无",20);
-		output = new TextArea(10,30);
+		output = new TextArea("在修改信息前请先通过学号查寻到需要"+"\n"+"修改信息的个人，然后在相应的文本框"
+				+"\n"+ "中修改信息，本程序只支持修改"+"\n"+"非（姓名，性别，身份，学号）",10,30);
 		style1 = new CheckboxGroup();
 		style2 = new CheckboxGroup();
 		
@@ -68,6 +69,8 @@ class StudentFrame extends Frame implements ActionListener,ItemListener{
 		btn3 = new Button("输出所有");
 		btn4 = new Button("删除信息");
 		
+		output.setBackground(Color.lightGray);
+		output.setForeground(Color.blue);
 		setLayout(new FlowLayout());//少不得，否则add添加的东西会一一覆盖，最后只有最后一个add能显示
 		setSize(300,550);
         setVisible(true);
@@ -99,6 +102,14 @@ class StudentFrame extends Frame implements ActionListener,ItemListener{
         man.addItemListener(this);
         woman.addItemListener(this);
         
+        input1.addFocusListener(new HandleFocus());
+        input2.addFocusListener(new HandleFocus());
+        input3.addFocusListener(new HandleFocus());
+        input4.addFocusListener(new HandleFocus());
+        input5.addFocusListener(new HandleFocus());
+        input6.addFocusListener(new HandleFocus());
+        input7.addFocusListener(new HandleFocus());
+        
 	}//构造函数
 	
 	public void actionPerformed(ActionEvent e) {
@@ -124,13 +135,15 @@ class StudentFrame extends Frame implements ActionListener,ItemListener{
 		}
 		}else
 			if(e.getSource()==btn1) {//如果触发修改按钮
-				if(stuOrtea) {
-				StudentList.getStudent(students, id).setsall( mailbox, professions, courses, tel);
-				output.setText(StudentList.getStudent(students, id).getsAll());
+				if(StudentList.seekAll(students, id)) {
+					Student p = StudentList.getStudent(students, id);
+				p.setsall( mailbox, professions, courses, tel);
+				output.setText(p.getsAll());
 				}
-				else {
-					StudentList.getStudent(teachers, id).settall(mailbox, professions, courses, tel,salary);
-					output.setText(StudentList.getStudent(teachers, id).gettAll());
+				else if(StudentList.seekAll(teachers, id)){
+					Student p = StudentList.getStudent(teachers, id);
+					p.settall(mailbox, professions, courses, tel,salary);
+					output.setText(p.gettAll());
 				}
 			}else
 				if(e.getSource()==btn2) {//如果触发查询按钮                 
@@ -195,6 +208,23 @@ class StudentFrame extends Frame implements ActionListener,ItemListener{
 		}
 		
 	}
+	class HandleFocus implements FocusListener{
+		
+		public void focusGained(FocusEvent e) {
+			TextField q = (TextField )(e.getSource());//将引发文本事件的事件源强制转换为文本类型
+			q.setText("");//将引发文本事件的文本设置为空
+			q.setBackground(Color.blue);
+		}
+
+		@Override
+		public void focusLost(FocusEvent e) {
+			TextField q = (TextField )(e.getSource());//将引发文本事件的事件源强制转换为文本类型
+			q.setForeground(Color.green);//将引发文本事件的文本设置为空
+			q.setBackground(Color.white);
+			
+		}
+		
+	}
 	
 	class windowsClose extends WindowAdapter{//window监视执行函数
     	public void windowClosing(WindowEvent e)
@@ -205,10 +235,6 @@ class StudentFrame extends Frame implements ActionListener,ItemListener{
     	}  	
     }//end of winC
 	
-	void alter() {
-		
-	}
-		
 }//end of StufentFrame
 
 class Student{
@@ -240,15 +266,15 @@ class Student{
      }
 	//用于输出全部信息
 	String getsAll() {
-		String s = new String("姓名："+name+"\n"+"学号："+id+"\n"+"联系方式："+tel+"\n"+"身份："+identity+"\n"+"性别："+sex+"\n"+"邮箱："+mailbox+"\n"+"专业："+professions+"\n"+"所修课程："+courses+"\n"+"\n");
+		String s = new String("姓名："+name+"\n"+"学号："+id+"\n"+"身份："+identity+"\n"+"性别："+sex+"\n"+"专业："+professions+"\n"+"所修课程："+courses+"\n"+"联系电话："+tel+"\n"+"邮箱："+mailbox+"\n"+"\n");
 		 return s;
 	 }
 	String gettAll() {
-		String s = new String("姓名："+name+"\n"+"工号："+id+"\n"+"联系方式："+tel+"\n"+"身份："+identity+"\n"+"性别："+sex+"\n"+"邮箱："+mailbox+"\n"+"专业："+professions+"\n"+"所授课程："+courses+"\n"+"薪水："+salary+"\n"+"\n");
+		String s = new String("姓名："+name+"\n"+"工号："+id+"\n"+"身份："+identity+"\n"+"性别："+sex+"\n"+"专业："+professions+"\n"+"所授课程："+courses+"\n"+"联系电话："+tel+"\n"+"邮箱："+mailbox+"\n"+"薪水："+salary+"\n"+"\n");
 		 return s;
 	 }
 	//用于修改信息
-	String setsAll(String a,String b,String c,String d,String f, String g,String h,String j) {
+/*	String setsAll(String a,String b,String c,String d,String f, String g,String h,String j) {
 		name = a;
 		identity = b;
 		sex = c;
@@ -258,7 +284,7 @@ class Student{
 		id = h;
 		tel = j;   
 		
-		String s = new String("姓名："+name+"\n"+"学号："+id+"\n"+"联系方式："+tel+"\n"+"身份："+identity+"\n"+"性别："+sex+"\n"+"邮箱："+mailbox+"\n"+"专业："+professions+"\n"+"所修课程："+courses+"\n"+"\n");
+		String s = new String("姓名："+name+"\n"+"学号："+id+"\n"+"身份："+identity+"\n"+"性别："+sex+"\n"+"专业："+professions+"\n"+"所修课程："+courses+"\n"+"联系电话："+tel+"\n"+"邮箱："+mailbox+"\n"+"\n");
 		 return s;
 	 }
 	String settAll(String a,String b,String c,String d,String f, String g,String h,String j,String k) {
@@ -272,9 +298,9 @@ class Student{
 		tel = j;
 		salary = k;
 		
-		String s = new String("姓名："+name+"\n"+"工号："+id+"\n"+"联系方式："+tel+"\n"+"身份："+identity+"\n"+"性别："+sex+"\n"+"邮箱："+mailbox+"\n"+"专业："+professions+"\n"+"所授课程："+courses+"\n"+"薪水："+salary+"\n"+"\n");
+		String s = new String("姓名："+name+"\n"+"工号："+id+"\n"+"身份："+identity+"\n"+"性别："+sex+"\n"+"专业："+professions+"\n"+"所授课程："+courses+"\n"+"联系电话："+tel+"\n"+"邮箱："+mailbox+"\n"+"薪水："+salary+"\n"+"\n");
 		 return s;
-	 }
+	 }*/
 	String setsall(String d,String f, String g,String j) {
 
 		mailbox = d;
