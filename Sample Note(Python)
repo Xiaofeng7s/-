@@ -1,0 +1,73 @@
+from PyQt5.QtWidgets import QMainWindow,QAction,QTextEdit,QApplication,QFileDialog,qApp
+import sys
+
+class myNote():
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+
+    def initUI(self):
+        self.window=QMainWindow()
+        self.window.setGeometry(400,400,500,800)
+
+        openAct=QAction('打开文件',self.window)
+        openAct.setShortcut('Ctrl+o')
+        openAct.triggered.connect(self.openFile)
+
+        saveAct=QAction('保存文件',self.window)
+        saveAct.setShortcut('Ctrl+s')
+        saveAct.triggered.connect(self.saveFile)
+
+        newAct=QAction('新建文件',self.window)
+        newAct.setShortcut('Ctrl+n')
+        newAct.triggered.connect(self.newFile)
+
+        exitAct=QAction('退出',self.window)
+        exitAct.triggered.connect(qApp.quit)
+
+
+        self.toolbar=self.window.addToolBar('open file')
+        self.toolbar.addAction(openAct)
+        self.toolbar.addAction(saveAct)
+        self.toolbar.addAction(newAct)
+        self.toolbar.addAction(exitAct)
+
+        self.textEdit=QTextEdit(self.window)
+        self.window.setCentralWidget(self.textEdit)
+
+
+
+    def openFile(self):
+        fname=QFileDialog.getOpenFileName(self.window,'open file','/home')
+        self.fileurl=fname[0]
+        if self.fileurl:
+            f=open(self.fileurl,'r')
+            with f:
+                file=f.read()
+                self.textEdit.setText(file)
+
+    def saveFile(self):
+        try:
+            f = open(self.fileurl, 'w')
+            with f:
+                file=self.textEdit.toPlainText()
+                f.write(file)
+        except:
+            self.newFile()
+            self.saveFile()
+
+
+    def newFile(self):
+        fname = QFileDialog.getSaveFileName(self.window,'save file','/home')
+        if fname[0]:
+            self.fileurl=fname[0]+".txt"
+            self.textEdit.setText("")
+
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = myNote()
+    ex.window.show()
+    sys.exit(app.exec_())
